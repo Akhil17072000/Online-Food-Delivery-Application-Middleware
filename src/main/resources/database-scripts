@@ -1,0 +1,276 @@
+
+connect system/root;
+
+create user ofda2 identified by ofda2;
+
+grant connect,resource,dba to ofda2;
+
+commit;
+
+connect ofda2/ofda2;
+
+create sequence HIBERNATE_SEQUENCE;
+
+commit;
+	
+create table customers
+(cust_id number(19) constraint customers_cust_id_pk primary key,
+first_name varchar2(50) constraint customers_full_name_nn not null,
+last_name varchar2(50) constraint customers_last_name_nn not null,
+gender varchar2(50) constraint customers_gender_nn not null,
+age varchar2(50) constraint customers_age_nn not null,
+mobile varchar2(50) constraint customers_mobile_nn not null,
+email varchar2(50) constraint customers_email_nn not null);
+
+
+
+Alter table customers Add building_name varchar2(50);
+Alter table customers Add area varchar2(50);
+Alter table customers Add street_no varchar2(50);
+Alter table customers Add city varchar2(50);
+Alter table customers Add state varchar2(50);
+Alter table customers Add country varchar2(50);
+Alter table customers Add pincode varchar2(50);
+
+commit;
+
+
+
+
+Insert into customers(cust_id,first_name,last_name,gender,age,mobile,email) values(101, 'Akash','Sharma','Male','25','9876543211','aks@gmail.com');
+Insert into customers(cust_id,first_name,last_name,gender,age,mobile,email) values(102, 'Rahul','Singh','Male','30','9854543211','rahul11@gmail.com');
+Insert into customers(cust_id,first_name,last_name,gender,age,mobile,email) values(103, 'Ram','Kumar','Male','40','9854543222','ram12@gmail.com');
+Insert into customers(cust_id,first_name,last_name,gender,age,mobile,email) values(104, 'Arti','Sharma','Female','40','9854543259','artish@gmail.com');
+Insert into customers(cust_id,first_name,last_name,gender,age,mobile,email) values(105, 'Anuj','Kumar','Male','22','9954113259','anuj@gmail.com');
+
+
+update customers set building_name='Guru Kripa';
+update customers set area='Krishna Nagar';
+update customers set street_no='Shankar Vihar';
+update customers set city='Mathura' ;
+update customers set state='Uttar Pradesh';
+update customers set country='India';
+update customers set pincode='281004';
+
+create table category	
+(cat_id number(19) constraint category_cat_id_pk primary key,
+category_name varchar2(50) constraint category_category_name_nn not null);
+
+insert into category values(100,'Sandwich');
+insert into category values(101,'Pizza');
+insert into category values(102,'Burger');
+insert into category values(103,'Fries');
+insert into category values(104,'Beverages');
+
+
+
+create table login
+(user_id number(19) constraint login_user_id_pk primary key,
+user_name varchar2(50) constraint login_user_name_un_nn not null,
+password varchar2(50) constraint login_password_nn not null);
+
+
+Alter table login add cust_id number(19);
+ALTER TABLE login
+ADD CONSTRAINT login_cust_id_fk
+  FOREIGN KEY (cust_id)
+  REFERENCES customers(cust_id);
+  
+  Alter table login drop column cust_id;
+  
+	  
+	insert into login(user_id,user_name,password,cust_id) values(1000,'Akash2021','Akash12345',101);
+	insert into login(user_id,user_name,password,cust_id) values(1001,'Rahul2021','Rahul12345',102);
+	insert into login(user_id,user_name,password) values(1002,'Ramesh2021','Ramesh12345');
+	insert into login(user_id,user_name,password,cust_id) values(1003,'Ram2021','Ram12345',103);
+	insert into login(user_id,user_name,password) values(1004,'Akshay2021','Akshay12345');
+
+
+
+create table order_details
+(order_id number(19) constraint order_details_order_id_pk primary key,
+order_date date constraint order_details_order_date_nn not null,
+order_status varchar2(50) constraint order_details_order_status_nn not null);
+
+Alter table order_details add cart_id number(19);
+ALTER TABLE order_details
+ADD CONSTRAINT order_details_cart_id_fk
+  FOREIGN KEY (cart_id)
+  REFERENCES food_cart(cart_id);
+  
+  Alter table order_details drop column cart_id;
+
+
+insert into order_details values(0001,'20-apr-2021','Delivered',01);
+insert into order_details values(0002,'20-apr-2021','Delivered',03);
+insert into order_details values(0003,'19-apr-2021','Delivered',02);
+insert into order_details values(0004,'19-apr-2021','Delivered',04);
+insert into order_details values(0005,'18-apr-2021','Delivered',05);	
+
+have to add  foreign key food cart
+
+
+create table bill
+(bill_id number(19) constraint bill_bill_id_pk primary key,
+total_item number(10) constraint bill_total_item_nn not null,
+total_cost number(10,2) constraint bill_total_cost_nn not null,
+bill_date date constraint bill_bill_date_nn not null,
+order_id number(19) constraint bill_order_id_fk references order_details(order_id));
+
+Alter table bill drop column order_id ;
+
+insert into bill values (100,5,500,'20-apr-2021',0001);
+insert into bill values (101,3,250,'20-apr-2021',0002);
+insert into bill values (102,6,650,'19-apr-2021',0003);
+insert into bill values (103,2,100,'19-apr-2021',0004);
+insert into bill values (104,5,455,'18-apr-2021',0005);
+
+
+create table food_cart
+(cart_id number(19) constraint food_cart_cart_id_pk primary key,
+cust_id number(19) constraint food_cart_cust_id_fk references customers(cust_id));
+
+
+have to add foreign key item
+
+Alter table food_cart add item_id number(19);
+ALTER TABLE food_cart
+ADD CONSTRAINT food_cart_item_id_fk
+  FOREIGN KEY (item_id)
+  REFERENCES items(item_id);
+
+ Alter table food_cart drop column cust_id;
+ Alter table food_cart drop column item_id;
+
+
+  
+insert into food_cart(cart_id,cust_id,item_id) values(01,101,1);
+insert into food_cart(cart_id,cust_id,item_id) values(02,102,2);
+insert into food_cart(cart_id,cust_id,item_id) values(03,103,3);
+insert into food_cart(cart_id,cust_id,item_id) values(04,104,4);
+insert into food_cart(cart_id,cust_id,item_id) values(05,105,5);
+  
+
+
+create table items
+(item_id number(19) constraint items_item_id_pk primary key,
+item_name varchar2(30) constraint items_item_name_nn not null,
+quantity number(10) constraint items_quantity_nn not null,
+cost number(10,2) constraint items_cost_nn not null);
+
+
+have to add foreign key restaurant
+
+Alter table items add restaurant_id number(19);
+ALTER TABLE items
+ADD CONSTRAINT items_restaurant_id_fk
+  FOREIGN KEY (restaurant_id)
+  REFERENCES restaurants(restaurant_id);
+  
+  Alter table items add cat_id number(19);
+ALTER TABLE items
+ADD CONSTRAINT items_cat_id_fk
+  FOREIGN KEY (cat_id)
+  REFERENCES category(cat_id);
+  
+Alter table items Add cart_id number(19);
+  ALTER TABLE items
+ADD CONSTRAINT items_cart_id_fk
+  FOREIGN KEY (cart_id)
+  REFERENCES food_cart(cart_id);
+
+
+Alter table items drop column restaurant_id;
+
+
+
+
+insert into items(item_id,item_name,quantity,cost) values(1,'Cheese Sandwich',10,50);
+insert into items(item_id,item_name,quantity,cost) values(2,'Double Cheese Grill Sandwich',20,75);
+insert into items(item_id,item_name,quantity,cost) values(3,'Veg Burger',10,55);
+insert into items(item_id,item_name,quantity,cost) values(4,'Veg Supreme Burger',50,85);
+insert into items(item_id,item_name,quantity,cost) values(5,'Cheese Pizza',6,100);
+insert into items(item_id,item_name,quantity,cost) values(6,'Tomato Onion Cheese Pizza',12,120);
+insert into items(item_id,item_name,quantity,cost) values(7,'French Fries',13,45);
+insert into items(item_id,item_name,quantity,cost) values(8,'Cold Coffee',14,72);
+insert into items(item_id,item_name,quantity,cost) values(9,'Ice Tea',12,70);
+insert into items(item_id,item_name,quantity,cost) values(10,'Coke',11,70);
+
+update items set cart_id=1 where item_id=1;
+update items set cart_id=1 where item_id=5;
+update items set cart_id=1 where item_id=6;
+update food_cart set item_id=5 where cart_id=5;
+update items set cart_id=2 where item_id in(2,7);
+update items set cart_id=3 where item_id in(3,8);
+update items set cart_id=4 where item_id in(4,9);
+update items set cart_id=5 where item_id in(5,10);
+
+
+update items set cat_id=100 where item_id in(1,2);
+update items set cat_id=102 where item_id in(3,4);
+update items set cat_id=101 where item_id in(5,6);
+update items set cat_id=103 where item_id in(7);
+update items set cat_id=104 where item_id in(8,9,10);
+
+ update items set restaurant_Id=1 where item_id in(1,7);
+update items set restaurant_Id=2 where item_id in(2,8);
+update items set restaurant_Id=3 where item_id in(3,9);
+update items set restaurant_Id=4 where item_id in(6,10);
+update items set restaurant_Id=5 where item_id=5;
+update items set restaurant_Id=6 where item_id=4;
+
+
+create table restaurants
+(restaurant_id number(19) constraint restaurants_restaurant_id_pk primary key,
+restaurant_name varchar2(30) constraint restaurants_restaurant_name_nn not null,
+manager_name varchar2(30) constraint restaurants_manager_name_nn not null,
+contact_number varchar2(50) constraint restaurants_contact_number_nn not null);
+
+ Alter table restaurants add item_id number(19);
+ALTER TABLE restaurants
+ADD CONSTRAINT restaurants_item_id_fk
+  FOREIGN KEY (item_id)
+  REFERENCES items(item_id);
+  
+  
+Alter table restaurants Add building_name varchar2(50);
+Alter table restaurants Add area varchar2(50);
+Alter table restaurants Add street_no varchar2(50);
+Alter table restaurants Add city varchar2(50);
+Alter table restaurants Add state varchar2(50);
+Alter table restaurants Add country varchar2(50);
+Alter table restaurants Add pincode varchar2(50);
+  
+  Alter table restaurants drop  column item_id ;
+  
+insert into restaurants(restaurant_id,restaurant_name,manager_name,contact_number,item_id) values(1,'Taj Hotel','Ram Kishan','9876543201',1);
+insert into restaurants(restaurant_id,restaurant_name,manager_name,contact_number,item_id) values(2,'Moti Mahal Hotel','Kishan','9876543201',2);
+insert into restaurants(restaurant_id,restaurant_name,manager_name,contact_number,item_id) values(3,'Agrawal Restaurant','Kishan kamal','9876543201',3);
+insert into restaurants(restaurant_id,restaurant_name,manager_name,contact_number,item_id) values(4,'Basera Restaurant','Ramesh jain','9876543201',6);
+insert into restaurants(restaurant_id,restaurant_name,manager_name,contact_number,item_id) values(5,'Hotel Heera','Suresh Sharma','9876543201',5);
+insert into restaurants(restaurant_id,restaurant_name,manager_name,contact_number,item_id) values(6,'Brijwasi Royal','Kamlesh Shri','9876543201',4);
+
+ update restaurants set building_name='Guru Krpia';
+update restaurants set building_name='Pacific Mall' where restaurant_id in(1,3);
+update restaurants set building_name='Pacific Mall' where restaurant_id in(1,2,3);
+ update restaurants set building_name='Great Indian Palace' where restaurant_id in(4,5,6);
+update restaurants set area='Refinary' where restaurant_id in(1,2,3);
+update restaurants set area='Sector 38' where restaurant_id in(4,5,6);
+update restaurants set street_no='A01D' where restaurant_id in(1,2,3);
+update restaurants set street_no='Block-A' where restaurant_id in(4,5,6);
+update restaurants set city='Mathura' where restaurant_id in(1,2,3);
+update restaurants set city='Noida' where restaurant_id in(4,5,6);
+update restaurants set state='Uttar Pradesh' where restaurant_id in(1,2,3);
+update restaurants set state='Uttar Pradesh' where restaurant_id in(4,5,6);
+update restaurants set country='India';
+update restaurants set pincode='455311' where restaurant_id in(1,2,3);
+update restaurants set pincode='281003' where restaurant_id in(4,5,6);
+
+
+ create table restaurant_item_list(
+ item_id number(19) references items(item_id),
+ restaurant_id number(19) references restaurants(restaurant_id));   
+ 
+  commit;
+   
+   
